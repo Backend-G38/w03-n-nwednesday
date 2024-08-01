@@ -1,8 +1,9 @@
 const catchError = require('../utils/catchError');
 const Course = require('../models/Course');
+const Student = require('../models/Student');
 
 const getAll = catchError(async (req, res) => {
-  const results = await Course.findAll();
+  const results = await Course.findAll({ include: [Student] });
   return res.json(results);
 });
 
@@ -34,6 +35,14 @@ const update = catchError(async (req, res) => {
   return res.json(result[1][0]);
 });
 
+const setStudents = catchError(async (req, res) => {
+  const { id } = req.params
+  const course = await Course.findByPk(id)
+  await course.setStudents(req.body)
+  const students = await course.getStudents()
+  return res.json(students)
+})
+
 
 module.exports = {
   getAll,
@@ -41,4 +50,5 @@ module.exports = {
   getOne,
   remove,
   update,
+  setStudents
 }
